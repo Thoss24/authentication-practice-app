@@ -8,18 +8,20 @@ function AuthenticationPage() {
 export const action = async ({request}) => {
   const searchParams = new URL(request.url).searchParams;
   const mode = searchParams.get('mode') || 'login';
+  // console.log(request)
+  // console.log(mode)
 
-  if (mode !== 'mode' && mode !== 'login') {
-    throw json({message: 'Unsupported mode'}, {status: 442})
+  console.log(mode)
+
+  if (mode !== 'login' && mode !== 'signup') {
+    throw json({message: 'Invalid mode'}, {status: 422})
   };
-  
+
   const data = await request.formData();
   const authData = {
-    email: data.get('email'),
+    name: data.get('email'),
     password: data.get('password')
   };
-
-  console.log(authData)
 
   const response = await fetch('http://localhost:8080/' + mode, {
     method: 'POST',
@@ -30,15 +32,14 @@ export const action = async ({request}) => {
   });
 
   if (response.status === 422 || response.status === 401) {
-    console.log("not working")
     return response
   };
 
   if (!response.ok) {
-    throw json({message: 'Could not authenticate'}, {status: 500})
+    throw json({message: 'Could not make request'}, {status: 500})
   };
 
-  return redirect('/')
+  return redirect('/');
 };
 
 export default AuthenticationPage;
